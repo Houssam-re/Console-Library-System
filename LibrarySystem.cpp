@@ -470,5 +470,5 @@ void LibrarySystem()
 }
 int main()
 {
-	//LibrarySystem();
+	LibrarySystem();
 }
