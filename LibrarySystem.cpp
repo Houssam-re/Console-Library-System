@@ -1,17 +1,18 @@
 #include<iostream>
 #include <iomanip>
 #include <Vector>
-#include "Array.h"
 #include <fstream>
 #include <cctype>
-
+#include <string>
+using namespace std;
 const string BookDataBase = "Books.txt";
+void LibrarySystem();
 
-
-enum enLibraryChoice{ enAddBook = 1 ,enSearchBooksByPref = 2,enPrintWhoborrowedBookByName = 3,
-						enPrintLibraryById = 4,enPrintLibraryByName = 5,enAddUser = 6,enUserBorrowBook = 7,enUserReturnBook = 8,
-							enPrintUsers = 9 , enExit = 10};
-
+enum enLibraryChoice {
+	enAddBook = 1, enSearchBooksByPref = 2, enPrintWhoborrowedBookByName = 3,
+	enPrintLibraryById = 4, enPrintLibraryByName = 5, enAddUser = 6, enUserBorrowBook = 7, enUserReturnBook = 8,
+	enPrintUsers = 9, enExit = 10
+};
 struct stBooks
 {
 	string name;
@@ -25,10 +26,12 @@ struct stUsers
 	string national_id;
 	vector <int> BookBorrow;
 };
+
 bool isPrefix(string Word, string Prefix)
 {
 	return (Prefix == Word.substr(0, Prefix.length()));
 }
+
 stBooks AddBook()
 {
 	stBooks Books;
@@ -41,6 +44,7 @@ stBooks AddBook()
 	return Books;
 
 }
+
 stUsers AddUser()
 {
 	stUsers User;
@@ -50,7 +54,8 @@ stUsers AddUser()
 	cin >> User.national_id;
 	return User;
 }
-string ConvertFromBookRecordToLine(stBooks Books , string delim = "#//#")
+
+string ConvertFromBookRecordToLine(stBooks Books, string delim = "#//#")
 {
 	string S1 = "";
 	S1 += to_string(Books.id) + delim;
@@ -58,7 +63,8 @@ string ConvertFromBookRecordToLine(stBooks Books , string delim = "#//#")
 	S1 += to_string(Books.TotalQuentity);
 	return S1;
 }
-vector <string> SplitFunction(string Words , string delim = "#//#")
+
+vector <string> SplitFunction(string Words, string delim = "#//#")
 {
 	vector <string> vString;
 	short pos;
@@ -78,6 +84,7 @@ vector <string> SplitFunction(string Words , string delim = "#//#")
 	}
 	return vString;
 }
+
 stBooks ConvertBookDataFromLineToRecord(string Line)
 {
 	stBooks Books;
@@ -87,28 +94,11 @@ stBooks ConvertBookDataFromLineToRecord(string Line)
 	Books.TotalQuentity = stoi(vString[2]);
 	return Books;
 }
+
 void PutBookDataToFile(vector <stBooks>& vBooks, string FileName = BookDataBase)
 {
 	fstream File;
 	File.open(FileName, ios::out | ios::app);
-	if (!File.is_open())
-	{
-		cout << "There is Problem Opening File ,,";
-		File.close();
-	}
-	else
-	{
-		for (stBooks& i : vBooks)
-		{
-			File << ConvertFromBookRecordToLine(i,"#//#") << endl;
-		}
-		File.close();
-	}
-}
-void ReloadBookDataFromVectorToFile(vector <stBooks> vBooks, string FileName = BookDataBase)
-{
-	fstream File;
-	File.open(FileName, ios::out );
 	if (!File.is_open())
 	{
 		cout << "There is Problem Opening File ,,";
@@ -123,6 +113,26 @@ void ReloadBookDataFromVectorToFile(vector <stBooks> vBooks, string FileName = B
 		File.close();
 	}
 }
+
+void ReloadBookDataFromVectorToFile(vector <stBooks> vBooks, string FileName = BookDataBase)
+{
+	fstream File;
+	File.open(FileName, ios::out);
+	if (!File.is_open())
+	{
+		cout << "There is Problem Opening File ,,";
+		File.close();
+	}
+	else
+	{
+		for (stBooks& i : vBooks)
+		{
+			File << ConvertFromBookRecordToLine(i, "#//#") << endl;
+		}
+		File.close();
+	}
+}
+
 vector <stBooks> PutBookDataFromFileToVector(string FileName = BookDataBase)
 {
 	fstream File;
@@ -136,13 +146,14 @@ vector <stBooks> PutBookDataFromFileToVector(string FileName = BookDataBase)
 	else
 	{
 		string line;
-		while (getline(File,line))
+		while (getline(File, line))
 		{
 			vBooks.push_back(ConvertBookDataFromLineToRecord(line));
 		}
 	}
 	return vBooks;
 }
+
 void AddBooks()
 {
 	vector <stBooks> vBooks;
@@ -154,13 +165,14 @@ void AddBooks()
 	do
 	{
 		vBooks.push_back(AddBook());
-	
+
 		cout << "\n Do You Want To Add More Books ? [y/n] ";
 		cin >> Answer;
 	} while (toupper(Answer) == 'Y');
 	PutBookDataToFile(vBooks, BookDataBase);
 }
-void AddUsers(vector <stUsers> &vUsers)
+
+void AddUsers(vector <stUsers>& vUsers)
 {
 	cout << "\n-----------------------------------\n";
 	cout << "\Add User Screen";
@@ -174,27 +186,29 @@ void AddUsers(vector <stUsers> &vUsers)
 		cout << "\n Do You Want To Add More Users ? [y/n] ";
 		cin >> Answer;
 	} while (toupper(Answer) == 'Y');
-	
+
 }
+
 vector <stBooks> OrdredBooksById()
 {
 	vector<stBooks> vBooks = PutBookDataFromFileToVector();
-	int i;
-	int j;
-	for (int i = 0 ;  i < vBooks.size() ; i++)
+	int i = 0;
+	int j = 0;
+	for (int i = 0; i < vBooks.size(); i++)
 	{
 		for (int j = i; j < vBooks.size(); j++)
 		{
 			if (vBooks[i].id > vBooks[j].id)
 			{
 				int temp = vBooks[i].id;
-				vBooks[i].id =vBooks[j].id;
-				vBooks[j].id= temp;
+				vBooks[i].id = vBooks[j].id;
+				vBooks[j].id = temp;
 			}
 		}
 	}
 	return vBooks;
 }
+
 vector <stBooks> OrdredBooksByName()
 {
 	vector<stBooks> vBooks = PutBookDataFromFileToVector();
@@ -212,28 +226,30 @@ vector <stBooks> OrdredBooksByName()
 	}
 	return vBooks;
 }
-void PrintUsers(vector <stUsers> &vUsers)
+
+void PrintUsers(vector <stUsers>& vUsers)
 {
-	if(!vUsers.empty())
-	for (stUsers& i : vUsers)
-	{
-		cout << "\nName : " << i.name << endl;
-		cout << "National id " << i.national_id << endl;
-		cout << "Borrow Books : \n";
-		if (!i.BookBorrow.empty())
+	if (!vUsers.empty())
+		for (stUsers& i : vUsers)
 		{
-			for (auto& j : i.BookBorrow)
+			cout << "\nName : " << i.name << endl;
+			cout << "National id " << i.national_id << endl;
+			cout << "Borrow Books : \n";
+			if (!i.BookBorrow.empty())
 			{
-				cout << j << " ";
+				for (auto& j : i.BookBorrow)
+				{
+					cout << j << " ";
+				}
 			}
+			cout << "\n________________________________________________";
 		}
-		cout << "\n________________________________________________";
-	}
 	else
 	{
 		cout << "There is No Users\n";
 	}
 }
+
 void PrintLibraryByid()
 {
 	vector <stBooks> vBooks = OrdredBooksById();
@@ -245,10 +261,11 @@ void PrintLibraryByid()
 	{
 		cout << "\nBook Name : " << i.name << endl;
 		cout << "Book id " << i.id << endl;
-		cout << "Book id " << i.TotalQuentity << endl;
+		cout << "Book Quentity " << i.TotalQuentity << endl;
 		cout << "________________________________________________";
 	}
 }
+
 void PrintLibraryByName()
 {
 	vector <stBooks> vBooks = OrdredBooksByName();
@@ -260,10 +277,59 @@ void PrintLibraryByName()
 	{
 		cout << "\nBook Name : " << i.name << endl;
 		cout << "Book id " << i.id << endl;
-		cout << "Book id " << i.TotalQuentity << endl;
+		cout << "Book Quentity " << i.TotalQuentity << endl;
 		cout << "________________________________________________";
 	}
 }
+
+bool isUserBorrowedBook(stUsers User)
+{
+	if (User.BookBorrow.empty())
+	{
+		return false;
+	}
+	return true;
+}
+
+vector <stUsers> OrdredUserByName(vector<stUsers> vUsers)
+{
+	vector<stUsers> vFUsers ;
+	for (auto& i : vUsers)
+	{
+		if (isUserBorrowedBook(i))
+		{
+			vFUsers.push_back(i);
+		}
+	}
+	if (!vFUsers.empty())
+	{
+
+		for (int i = 0; i < vFUsers.size(); i++)
+		{
+			for (int j = i; j < vFUsers.size(); j++)
+			{
+				if (vFUsers[i].name > vFUsers[j].name)
+				{
+					string temp = vFUsers[i].name;
+					vFUsers[i].name = vFUsers[j].name;
+					vFUsers[j].name = temp;
+				}
+			}
+		}
+	}
+		return vFUsers;
+	
+}
+
+void PrintUserBrrowBooksyByName(vector<stUsers> vUsers)
+{
+	vector <stUsers> vFUsers = OrdredUserByName(vUsers) ;
+	cout << "\n-----------------------------------\n";
+	cout << "\Print User Borrow Book By Name ";
+	cout << "\n-----------------------------------\n";
+	PrintUsers(vFUsers);
+}
+
 void SearchBooksByPrefix()
 {
 	vector <stBooks> vBooks = PutBookDataFromFileToVector();
@@ -272,20 +338,21 @@ void SearchBooksByPrefix()
 	cout << "\Search Book By Refrence Screen";
 	cout << "\n-----------------------------------\n";
 
-	cout << "Ennter Book name Prefix : ";
+	cout << "Enter Book name Prefix : ";
 	cin >> prefix;
 	for (auto& i : vBooks)
 	{
-		if (isPrefix(i.name,prefix))
+		if (isPrefix(i.name, prefix))
 		{
 			cout << i.name << endl;
 		}
 
 	}
 }
-bool isUserFound(vector <stUsers> &vUsers,string UserName , stUsers &User)
+
+bool isUserFound(vector <stUsers>& vUsers, string UserName, stUsers& User)
 {
-	 ;
+	;
 	for (auto& i : vUsers)
 	{
 		if (i.name == UserName)
@@ -297,7 +364,8 @@ bool isUserFound(vector <stUsers> &vUsers,string UserName , stUsers &User)
 
 	return false;
 }
-bool isBookFound(string BookName ,stBooks &Book)
+
+bool isBookFound(string BookName, stBooks& Book)
 {
 	vector <stBooks> vBooks = PutBookDataFromFileToVector();
 	for (auto& i : vBooks)
@@ -307,17 +375,19 @@ bool isBookFound(string BookName ,stBooks &Book)
 			Book = i;
 			return true;
 		}
-		}
+	}
 	return false;
 }
-void ReadUserAndBookName(string &UserName ,string &BookName)
+
+void ReadUserAndBookName(string& UserName, string& BookName)
 {
 	cout << "Enter User Name : ";
 	cin >> UserName;
 	cout << "Enter Book Name : ";
 	cin >> BookName;
 }
-void UserBorroWBook(vector <stUsers> &vUsers)
+
+void UserBorroWBook(vector <stUsers>& vUsers)
 {
 	string UserName;
 	string BookName;
@@ -326,36 +396,7 @@ void UserBorroWBook(vector <stUsers> &vUsers)
 	cout << "\n-----------------------------------\n";
 	cout << "\ User Borrow Book";
 	cout << "\n-----------------------------------\n";
-
-	vector <stBooks> vBooks = PutBookDataFromFileToVector();
-	ReadUserAndBookName(UserName, BookName);
-	while (!isBookFound(BookName,Book) || !isUserFound(vUsers,UserName,User))
-	{
-		cout << "User Or Book Not found Please search again  : \n\n";
-		ReadUserAndBookName(UserName, BookName);
-	}
-	for (auto& i : vBooks)
-	{
-		if (i.name == Book.name)
-		{
-			i.TotalQuentity--;
-		}
-	}
-	for (auto& i : vUsers)
-	{
-		if (i.name == User.name)
-		{
-			i.BookBorrow.push_back(Book.id);
-		}
-	}
-	ReloadBookDataFromVectorToFile(vBooks);
-}
-void UserReturnBook(vector <stUsers>& vUsers)
-{
-	string UserName;
-	string BookName;
-	stUsers User;
-	stBooks Book;
+	bool ThereisQuentity = true;
 	vector <stBooks> vBooks = PutBookDataFromFileToVector();
 	ReadUserAndBookName(UserName, BookName);
 	while (!isBookFound(BookName, Book) || !isUserFound(vUsers, UserName, User))
@@ -367,19 +408,69 @@ void UserReturnBook(vector <stUsers>& vUsers)
 	{
 		if (i.name == Book.name)
 		{
-			i.TotalQuentity++;
+			if(i.TotalQuentity > 0)
+			i.TotalQuentity--;
+			else
+			{
+				ThereisQuentity = false;
+				cout << "Book Quentity is end\n";
+			}
 		}
+	}
+	for (auto& i : vUsers)
+	{
+		if (i.name == User.name)
+		{
+			if(ThereisQuentity)
+			i.BookBorrow.push_back(Book.id);
+		}
+	}
+	ReloadBookDataFromVectorToFile(vBooks);
+}
+
+void UserReturnBook(vector <stUsers>& vUsers)
+{
+	string UserName;
+	string BookName;
+	stUsers User;
+	stBooks Book;
+	bool isUserHasThebook  = false;
+	vector <stBooks> vBooks = PutBookDataFromFileToVector();
+	ReadUserAndBookName(UserName, BookName);
+	while (!isBookFound(BookName, Book) || !isUserFound(vUsers, UserName, User))
+	{
+		cout << "User Or Book Not found Please search again  : \n\n";
+		ReadUserAndBookName(UserName, BookName);
 	}
 	for (int j = 0; j < vUsers.size(); j++)
 	{
 		if (vUsers[j].name == User.name)
 		{
-			vUsers[j].BookBorrow.erase(vUsers[j].BookBorrow.begin() + j);
+			if (!vUsers[j].BookBorrow.empty())
+			{
+				vUsers[j].BookBorrow.erase(vUsers[j].BookBorrow.begin() + j);
+				isUserHasThebook = true;
+			}
+		}
+
+	}
+	for (auto& i : vBooks)
+	{
+		if (i.name == Book.name)
+		{
+			if(isUserHasThebook)
+			i.TotalQuentity++;
+			else
+			{
+				cout << "\nUser Dont Have Book \n";
+			}
 		}
 	}
+
 	ReloadBookDataFromVectorToFile(vBooks);
 
 }
+
 short ReadMainMenueOption()
 {
 	cout << "Choose what do you want to do? [1 to 10]? ";
@@ -406,6 +497,7 @@ void ShowMenu()
 	cout << "\t[9] Print Users." << endl;
 
 }
+
 void GoBackToMainMenue()
 {
 	cout << "\n\nPress any key to go back to Main Menue...";
@@ -413,6 +505,7 @@ void GoBackToMainMenue()
 	LibrarySystem();
 
 }
+
 void LibrarySystem()
 {
 	ShowMenu();
@@ -429,9 +522,12 @@ void LibrarySystem()
 		system("cls");
 		SearchBooksByPrefix();
 		GoBackToMainMenue();
+		break;
 	case enLibraryChoice::enPrintWhoborrowedBookByName:
 		system("cls");
+		PrintUserBrrowBooksyByName(vUsers);
 		GoBackToMainMenue();
+		break;
 	case enLibraryChoice::enPrintLibraryById:
 		system("cls");
 		PrintLibraryByid();
@@ -464,11 +560,12 @@ void LibrarySystem()
 		GoBackToMainMenue();
 		break;
 	default:
-			exit(0);
-			break;
-	}
-}
+		exit(0);
+		break;
+	}}
+
 int main()
 {
 	LibrarySystem();
+	
 }
